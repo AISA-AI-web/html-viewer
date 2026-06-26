@@ -26,7 +26,7 @@ safe to re-run.
 
 The app is configured (in `src/lib/config.js`) with:
 
-- **Project URL:** `https://ojifqcnsvbvkvvpvwmovr.supabase.co`
+- **Project URL:** `https://ojifqcnsvbvkvpvwmovr.supabase.co`
 - **Publishable (anon) key:** `sb_publishable_87Sk_...`
 
 Open Supabase → **Project Settings → Data API** and confirm the **Project URL**
@@ -49,7 +49,7 @@ Supabase → **Authentication → URL Configuration**:
 Authentication → **Providers → Google** → enable, and paste a Google OAuth
 client ID + secret (from Google Cloud Console → Credentials → OAuth client;
 set the authorized redirect URI to the value Supabase shows on that page,
-i.e. `https://ojifqcnsvbvkvvpvwmovr.supabase.co/auth/v1/callback`).
+i.e. `https://ojifqcnsvbvkvpvwmovr.supabase.co/auth/v1/callback`).
 Until Google is configured, the "Continue with Google" button will error —
 email magic link still works.
 
