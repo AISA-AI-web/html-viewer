@@ -12,7 +12,7 @@
 // matches Supabase → Project Settings → Data API → Project URL.
 export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
-  'https://ojifqcnsvbvkvvpvwmovr.supabase.co'
+  'https://ojifqcnsvbvkvpvwmovr.supabase.co'
 
 export const SUPABASE_ANON_KEY =
   import.meta.env.VITE_SUPABASE_ANON_KEY ||
