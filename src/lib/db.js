@@ -53,13 +53,21 @@ export async function createSimulation(payload) {
 }
 
 export async function updateSimulation(id, payload) {
-  const { error } = await supabase.from('simulations').update(payload).eq('id', id)
+  // .select() so we can detect a zero-row update — PostgREST returns no error
+  // when RLS filters the row out, which would otherwise look like success.
+  const { data, error } = await supabase.from('simulations').update(payload).eq('id', id).select('id')
   if (error) throw error
+  if (!data || data.length === 0) {
+    throw new Error("Couldn't save — you may not have permission to edit this simulation.")
+  }
 }
 
 export async function deleteSimulation(id) {
-  const { error } = await supabase.from('simulations').delete().eq('id', id)
+  const { data, error } = await supabase.from('simulations').delete().eq('id', id).select('id')
   if (error) throw error
+  if (!data || data.length === 0) {
+    throw new Error("Couldn't delete — you may not have permission, or it no longer exists.")
+  }
 }
 
 export async function incrementView(id) {
@@ -74,6 +82,16 @@ export async function getAuthorNames(ids) {
   const { data, error } = await supabase.from('profiles').select('id, display_name').in('id', unique)
   if (error) return {}
   return Object.fromEntries(data.map((p) => [p.id, p.display_name]))
+}
+
+// Just the rating aggregates — avoids re-downloading the html blob after a vote.
+export async function getSimulationStats(id) {
+  const { data } = await supabase
+    .from('simulations')
+    .select('avg_rating, rating_count')
+    .eq('id', id)
+    .single()
+  return data
 }
 
 export async function getMyRating(simulationId, userId) {

@@ -100,6 +100,8 @@ for each row execute function public.set_updated_at();
 
 -- Atomic view-count bump, callable by anonymous viewers (students) without
 -- granting them UPDATE on the table. Only touches published rows.
+-- NOTE: view_count is best-effort/un-deduplicated — treat it as a soft signal,
+-- not an authoritative or anti-gameable metric.
 create or replace function public.increment_view(sim_id uuid)
 returns void language sql security definer set search_path = public as $$
   update public.simulations set view_count = view_count + 1
@@ -142,8 +144,25 @@ drop policy if exists ratings_insert_self on public.ratings;
 drop policy if exists ratings_update_self on public.ratings;
 drop policy if exists ratings_delete_self on public.ratings;
 create policy ratings_select_all  on public.ratings for select using (true);
-create policy ratings_insert_self on public.ratings for insert with check (auth.uid() = user_id);
-create policy ratings_update_self on public.ratings for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- Insert/update also require the target simulation to be visible to the caller,
+-- so users can't rate (or probe) drafts they shouldn't see.
+create policy ratings_insert_self on public.ratings for insert
+  with check (
+    auth.uid() = user_id
+    and exists (
+      select 1 from public.simulations s
+      where s.id = simulation_id and (s.is_published or s.author_id = auth.uid())
+    )
+  );
+create policy ratings_update_self on public.ratings for update
+  using (auth.uid() = user_id)
+  with check (
+    auth.uid() = user_id
+    and exists (
+      select 1 from public.simulations s
+      where s.id = simulation_id and (s.is_published or s.author_id = auth.uid())
+    )
+  );
 create policy ratings_delete_self on public.ratings for delete using (auth.uid() = user_id);
 
 -- ---------------------------------------------------------------------------

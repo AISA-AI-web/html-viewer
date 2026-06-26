@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useAuth } from '../lib/auth.jsx'
-import { getSimulation, incrementView, getMyRating, rateSimulation, getAuthorNames } from '../lib/db'
+import { getSimulation, incrementView, getMyRating, rateSimulation, getAuthorNames, getSimulationStats } from '../lib/db'
 import SandboxedHtml from '../components/SandboxedHtml.jsx'
 import QrOverlay from '../components/QrOverlay.jsx'
 import Stars from '../components/Stars.jsx'
@@ -42,8 +42,9 @@ export default function Viewer() {
     setMyRating(n)
     try {
       await rateSimulation(sim.id, user.id, n)
-      const fresh = await getSimulation(sim.id)
-      setSim(fresh)
+      // Refresh only the aggregates — don't re-fetch html (it would reset the iframe).
+      const fresh = await getSimulationStats(sim.id)
+      if (fresh) setSim((s) => ({ ...s, ...fresh }))
     } catch { /* keep optimistic value */ }
   }, [user, sim])
 
