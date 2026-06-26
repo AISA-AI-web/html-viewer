@@ -18,9 +18,12 @@ async function ensureProfile(user) {
     .then(() => {}, () => {}) // swallow — RLS/offline shouldn't break the session
 }
 
-export function AuthProvider({ children }) {
+export function AuthProvider({ children, initialAuthError = null }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  // Error from the redirect exchange (bootstrapAuth), surfaced so the Login
+  // page can show why a magic link / OAuth round-trip failed.
+  const [authError, setAuthError] = useState(initialAuthError)
 
   useEffect(() => {
     let active = true
@@ -31,7 +34,10 @@ export function AuthProvider({ children }) {
     })
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
-      if (session?.user) ensureProfile(session.user)
+      if (session?.user) {
+        ensureProfile(session.user)
+        setAuthError(null) // a successful sign-in clears any stale redirect error
+      }
     })
     return () => {
       active = false
@@ -53,7 +59,7 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut()
   }, [])
 
-  const value = { user, loading, signInWithGoogle, signInWithEmail, signOut }
+  const value = { user, loading, authError, signInWithGoogle, signInWithEmail, signOut }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
