@@ -1,16 +1,23 @@
-# React + Vite
+# EduSim Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A teacher-built library of interactive learning simulations.
 
-Currently, two official plugins are available:
+Teachers paste the self-contained HTML they get from **EduSim**, tag it by grade,
+subject, concept, and standard, and publish it to a shared library. Every
+simulation gets a permanent link and a **QR code** so students can open and run
+it on any device — no account needed. Teachers can browse, search, filter, and
+rate each other's simulations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Frontend:** Vite + React (static), deployed to GitHub Pages.
+- **Backend:** Supabase (Postgres + Auth), secured by Row-Level Security.
+- **Untrusted HTML** runs in a locked-down, opaque-origin iframe.
 
-## React Compiler
+## Getting started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+See **[SETUP.md](SETUP.md)** for the one-time Supabase + GitHub Pages setup, and
+for local development instructions.
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```bash
+npm install
+npm run dev      # http://localhost:5173/html-viewer/
+```
