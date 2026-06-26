@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth.jsx'
 
 export default function Login() {
-  const { user, signInWithGoogle, signInWithEmail } = useAuth()
+  const { user, authError, signInWithGoogle, signInWithEmail } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
-  const [error, setError] = useState('')
+  // Seed from authError so a failed redirect (expired/abused link, missing
+  // code-verifier) shows a message instead of a silent logged-out page.
+  const [error, setError] = useState(authError || '')
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
